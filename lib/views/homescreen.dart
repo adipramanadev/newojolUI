@@ -1,27 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-void main() => runApp(const OjekApp());
-
-class OjekApp extends StatelessWidget {
-  const OjekApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    const brandGreen = Color(0xFF00AA13);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Ojek Online UI',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: brandGreen),
-        scaffoldBackgroundColor: const Color(0xFFF6F7F9),
-        fontFamily: 'Roboto',
-      ),
-      home: const HomeShell(),
-    );
-  }
-}
+import 'package:newojol/model/service.dart';
+import 'package:newojol/views/layanan.dart';
 
 /// Shell dengan BottomNavigationBar
 class HomeShell extends StatefulWidget {
@@ -102,7 +82,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    const brandGreen = Color(0xFF00AA13);
+    const brandGreen = Color.fromARGB(255, 255, 102, 0);
     return SafeArea(
       child: CustomScrollView(
         slivers: [
@@ -115,13 +95,7 @@ class _HomePageState extends State<HomePage> {
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [brandGreen, Color(0xFF0BBF25)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
+                decoration: const BoxDecoration(),
                 // ⬇️ HAPUS Expanded di sini (penyebab error)
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           size: 22,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 25),
                         Expanded(
                           child: Text(
                             'Antar ke: Jl. Melati Raya No. 204',
@@ -156,7 +130,8 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 12),
-
+                    // Bar pencarian
+                    
                     // Kartu saldo
                     Container(
                       decoration: BoxDecoration(
@@ -172,7 +147,11 @@ class _HomePageState extends State<HomePage> {
                             value: 'Rp 125.500',
                           ),
                           const SizedBox(width: 14),
-                          Container(width: 1, height: 28, color: Colors.black12),
+                          Container(
+                            width: 1,
+                            height: 28,
+                            color: Colors.black12,
+                          ),
                           const SizedBox(width: 14),
                           _walletPill(
                             icon: Icons.card_giftcard,
@@ -191,7 +170,9 @@ class _HomePageState extends State<HomePage> {
                                   fontWeight: FontWeight.w700,
                                 ),
                                 shape: const StadiumBorder(),
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                ),
                                 minimumSize: const Size(0, 36),
                               ),
                               onPressed: () {},
@@ -202,8 +183,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    
                   ],
                 ),
               ),
@@ -214,7 +193,7 @@ class _HomePageState extends State<HomePage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: const _ServicesGrid(),
+              child: ServicesGrid(),
             ),
           ),
 
@@ -259,36 +238,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-          ),
-
-          // Section: Rekomendasi dekat
-          SliverToBoxAdapter(
-            child: _SectionHeader(
-              title: 'Terdekat di sekitar kamu',
-              actionText: 'Lihat semua',
-              onTap: () {},
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 140,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                scrollDirection: Axis.horizontal,
-                itemCount: 8,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, i) => _MerchantChip(
-                  name: 'Warung ${i + 1}',
-                  image:
-                      'https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop',
-                  rating: 4.5 - (i * 0.1),
-                  eta: 15 + i,
                 ),
               ),
             ),
@@ -363,78 +312,6 @@ class _HomePageState extends State<HomePage> {
 }
 
 /// Grid layanan utama (Ride, Food, Send, Mart, Bills, dll)
-class _ServicesGrid extends StatelessWidget {
-  final _items = const [
-    _Service(icon: Icons.motorcycle, label: 'Ride', color: Color(0xFFE8F7EA)),
-    _Service(icon: Icons.fastfood, label: 'Food', color: Color(0xFFFFF6E6)),
-    _Service(
-      icon: Icons.local_shipping,
-      label: 'Send',
-      color: Color(0xFFE6F3FF),
-    ),
-    _Service(icon: Icons.store, label: 'Mart', color: Color(0xFFF1E8FF)),
-    _Service(
-      icon: Icons.receipt_long,
-      label: 'Bills',
-      color: Color(0xFFEAF2F8),
-    ),
-    _Service(icon: Icons.more_horiz, label: 'More', color: Color(0xFFF2F2F2)),
-  ];
-
-  const _ServicesGrid();
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _items.length,
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisExtent: 92,
-      ),
-      itemBuilder: (context, i) {
-        final s = _items[i];
-        return InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(12),
-          child: Column(
-            children: [
-              Container(
-                height: 58,
-                width: 58,
-                decoration: BoxDecoration(
-                  color: s.color,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(s.icon, size: 28, color: Colors.black87),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                s.label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _Service {
-  final IconData icon;
-  final String label;
-  final Color color;
-  const _Service({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-}
 
 class _PromoCard extends StatelessWidget {
   final String image;
